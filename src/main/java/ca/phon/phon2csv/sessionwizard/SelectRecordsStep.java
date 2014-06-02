@@ -29,6 +29,7 @@ import ca.phon.project.Project;
 import ca.phon.session.RecordFilter;
 import ca.phon.session.Session;
 import ca.phon.ui.decorations.DialogHeader;
+import ca.phon.ui.nativedialogs.FileFilter;
 import ca.phon.ui.text.FileSelectionField;
 import ca.phon.ui.text.FileSelectionField.SelectionMode;
 import ca.phon.ui.wizard.WizardStep;
@@ -90,8 +91,9 @@ public class SelectRecordsStep extends WizardStep {
 		
 		dirPanel.add(new JLabel("Save as:"), cc.xy(1,1));
 		saveLocationField = new FileSelectionField();
-		saveLocationField.setMode(SelectionMode.FOLDERS);
+		saveLocationField.setMode(SelectionMode.FILES);
 		saveLocationField.setEditable(false);
+		saveLocationField.setFileFilter(FileFilter.csvFilter);
 		saveLocationField.setFile(new File(getDefaultSaveLocation()));
 		
 		dirPanel.add(saveLocationField, cc.xyw(3,1,2));

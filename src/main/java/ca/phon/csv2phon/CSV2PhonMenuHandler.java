@@ -5,6 +5,8 @@ import java.awt.Window;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 
+import ca.phon.app.project.ProjectFrame;
+import ca.phon.app.project.ProjectWindow;
 import ca.phon.csv2phon.wizard.CSVImportWizard;
 import ca.phon.plugin.IPluginExtensionFactory;
 import ca.phon.plugin.IPluginExtensionPoint;
@@ -38,9 +40,8 @@ public class CSV2PhonMenuHandler
 
 	@Override
 	public void filterWindowMenu(Window owner, JMenuBar menuBar) {
-		if(!(owner instanceof CommonModuleFrame)) return;
+		if(!(owner instanceof ProjectWindow)) return;
 		final CommonModuleFrame cmf = (CommonModuleFrame)owner;
-		final Project project = cmf.getExtension(Project.class);
 		
 		JMenu pluginsMenu = null;
 		for(int i = 0; i < menuBar.getMenuCount(); i++) {
@@ -60,8 +61,8 @@ public class CSV2PhonMenuHandler
 	}
 	
 	public void cvs2PhonWizard(PhonActionEvent pae) {
-		final CommonModuleFrame cmf = (CommonModuleFrame)pae.getData();
-		final Project project = cmf.getExtension(Project.class);
+		final ProjectWindow pw = (ProjectWindow)pae.getData();
+		final Project project = pw.getProject();
 		if(project == null) return;
 		
 		final CSVImportWizard wizard = new CSVImportWizard(project);
