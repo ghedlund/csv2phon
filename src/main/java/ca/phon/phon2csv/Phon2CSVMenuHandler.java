@@ -1,6 +1,7 @@
 package ca.phon.phon2csv;
 
 import java.awt.Window;
+import java.util.logging.Logger;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -15,15 +16,22 @@ import ca.phon.phon2csv.wizard.CSVExportWizard;
 import ca.phon.plugin.IPluginExtensionFactory;
 import ca.phon.plugin.IPluginExtensionPoint;
 import ca.phon.plugin.IPluginMenuFilter;
+import ca.phon.plugin.PhonPlugin;
 import ca.phon.project.Project;
 import ca.phon.session.Session;
 import ca.phon.ui.CommonModuleFrame;
 import ca.phon.ui.action.PhonActionEvent;
 import ca.phon.ui.action.PhonUIAction;
 
+@PhonPlugin(name="phon2csv",
+	author="Greg J. Hedlund",
+	version="1-SNAPSHOT",
+	minPhonVersion="1.7.0")
 public class Phon2CSVMenuHandler 
 	implements IPluginMenuFilter, IPluginExtensionPoint<IPluginMenuFilter> {
 
+	private final static Logger LOGGER = Logger.getLogger(Phon2CSVMenuHandler.class.getName());
+	
 	@Override
 	public Class<?> getExtensionType() {
 		return IPluginMenuFilter.class;
@@ -61,7 +69,8 @@ public class Phon2CSVMenuHandler
 			}
 		} else if(owner instanceof SessionEditor) {
 			JMenu fileMenu = menuBar.getMenu(0);
-			
+			if(fileMenu == null) return;
+		
 			final PhonUIAction saveAsCsvAct = new PhonUIAction(this, "session2CsvWizard", owner);
 			saveAsCsvAct.putValue(PhonUIAction.NAME, "Save as CSV...");
 			saveAsCsvAct.putValue(PhonUIAction.SHORT_DESCRIPTION, "Save session as CSV");

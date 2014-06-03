@@ -17,7 +17,10 @@ import ca.phon.ui.CommonModuleFrame;
 import ca.phon.ui.action.PhonActionEvent;
 import ca.phon.ui.action.PhonUIAction;
 
-@PhonPlugin
+@PhonPlugin(name="csv2phon",
+	author="Greg J. Hedlund",
+	version="1-SNAPSHOT",
+	minPhonVersion="1.7.0")
 public class CSV2PhonMenuHandler 
 	implements IPluginMenuFilter, IPluginExtensionPoint<IPluginMenuFilter> {
 
