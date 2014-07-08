@@ -207,6 +207,7 @@ public class CSVImporter {
 			
 			// add a new record to the transcript
 			Record utt = factory.createRecord();
+			t.addRecord(utt);
 			
 			for(int colIdx = 0; colIdx < colLine.length; colIdx++) {
 				String csvcol = colLine[colIdx];
@@ -256,10 +257,12 @@ public class CSVImporter {
 					if(speaker == null) {
 						speaker = factory.createParticipant();
 						speaker.setName(rowval);
+						t.addParticipant(speaker);
 					}
 
 					utt.setSpeaker(speaker);
 				} else {
+					if(colmap.isGrouped() == null) colmap.setGrouped(true);
 					// convert rowval into a list of group values
 					List<String> rowVals = new ArrayList<String>();
 					if(colmap.isGrouped() && rowval.startsWith("[") && rowval.endsWith("]")) {
@@ -289,6 +292,7 @@ public class CSVImporter {
 								if(tc != null) {
 									grpVal = tc.convert(grpVal);
 								}
+								grpVal = grpVal.trim();
 								final IPATranscript ipa = (new IPATranscriptBuilder()).append(grpVal).toIPATranscript();
 								ipaTier.addGroup(ipa);
 							}
@@ -329,8 +333,17 @@ public class CSVImporter {
 				
 				final SyllabifierLibrary library = SyllabifierLibrary.getInstance();
 				
-				final Language targetLang = Language.parseLanguage(targetMapping.getSyllabifier());
-				final Language actualLang = Language.parseLanguage(actualMapping.getSyllabifier());
+				String targetLangName = targetMapping.getSyllabifier();
+				if(targetLangName == null) {
+					targetLangName = SyllabifierLibrary.getInstance().defaultSyllabifierLanguage().toString();
+				}
+				final Language targetLang = Language.parseLanguage(targetLangName);
+				
+				String actualLangName = targetMapping.getSyllabifier();
+				if(actualLangName == null) {
+					actualLangName = SyllabifierLibrary.getInstance().defaultSyllabifierLanguage().toString();
+				}
+				final Language actualLang = Language.parseLanguage(actualLangName);
 				
 				final PhoneAligner aligner = new PhoneAligner();
 				
@@ -355,6 +368,8 @@ public class CSVImporter {
 				
 			}
 		} // end while(currentRow)
+		
+		reader.close();
 		
 		// save transcript
 		final UUID writeLock = project.getSessionWriteLock(t);

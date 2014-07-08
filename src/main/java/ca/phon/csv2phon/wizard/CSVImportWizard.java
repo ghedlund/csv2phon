@@ -152,7 +152,7 @@ public class CSVImportWizard extends WizardFrame {
 				
 				saveSettings();
 				CSVImporter importer =
-					new CSVImporter(dirStep.getBase(), importDescription, getProject());
+					new CSVImporter(dirStep.getBase().getAbsolutePath(), importDescription, getProject());
 				importer.setFileEncoding(dirStep.getFileEncoding());
 				importer.performImport();
 				
@@ -194,7 +194,7 @@ public class CSVImportWizard extends WizardFrame {
 	@Override
 	protected void next() {
 		if(super.getCurrentStep() == dirStep) {
-			sessionInfoStep.setBase(dirStep.getBase());
+			sessionInfoStep.setBase(dirStep.getBase().getAbsolutePath());
 			
 			
 			ObjectFactory factory = new ObjectFactory();
@@ -222,7 +222,7 @@ public class CSVImportWizard extends WizardFrame {
 			
 			sessionInfoStep.setSettings(importDescription);
 		} else if(super.getCurrentStep() == sessionInfoStep) {
-			columnMapStep.setBase(dirStep.getBase());
+			columnMapStep.setBase(dirStep.getBase().getAbsolutePath());
 			columnMapStep.setSettings(importDescription);
 			
 			partsStep.setSettings(importDescription);

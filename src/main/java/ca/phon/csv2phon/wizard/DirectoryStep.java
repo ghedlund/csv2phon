@@ -60,8 +60,6 @@ public class DirectoryStep extends CSVImportStep {
 	
 	private JComboBox charsetBox;
 	
-	private String base;
-	
 	private String charsetName = "UTF-8";
 	
 	public DirectoryStep() {
@@ -121,15 +119,15 @@ public class DirectoryStep extends CSVImportStep {
 		
 		// make sure a directory is selected and exists
 		if(getBase() != null) {
-			File f = new File(getBase());
+			File f = getBase();
 			retVal = f.exists() && f.isDirectory();
 		}
 		
 		return retVal;
 	}
 	
-	public String getBase() {
-		return base;
+	public File getBase() {
+		return csvDirField.getSelectedFile();
 	}
 
 	public String getFileEncoding()  {

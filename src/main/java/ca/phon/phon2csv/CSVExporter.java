@@ -114,7 +114,8 @@ public class CSVExporter {
 			
 			// write record info
 			for(Record utt:utts) {
-				if(!recordFilter.checkRecord(utt)) continue;
+				
+				if(recordFilter != null && !recordFilter.checkRecord(utt)) continue;
 				
 				line = new ArrayList<String>();
 				

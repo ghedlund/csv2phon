@@ -31,7 +31,7 @@
         <xs:sequence>
             <xs:element name="csvcolumn" minOccurs="1" maxOccurs="1" type="xs:string"/>
             <xs:element name="phontier" minOccurs="0" maxOccurs="1" type="xs:string"/>
-            <xs:element name="grouped" minOccurs="0" maxOccurs="1" type="xs:boolean"/>
+            <xs:element name="grouped" minOccurs="0" maxOccurs="1" type="xs:boolean" default="true"/>
             <xs:element name="filter" minOccurs="0" maxOccurs="1" type="xs:string"/>
             <xs:element name="script" type="xs:string" minOccurs="0" maxOccurs="1"/>
             <xs:element name="syllabifier" type="xs:string" minOccurs="0" maxOccurs="1"/>
