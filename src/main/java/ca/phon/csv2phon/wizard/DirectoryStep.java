@@ -86,7 +86,7 @@ public class DirectoryStep extends CSVImportStep {
 		
 		csvDirField = new FileSelectionField();
 		csvDirField.setMode(SelectionMode.FOLDERS);
-		csvDirField.setEditable(false);
+		csvDirField.getTextField().setEditable(false);
 		
 		// setup charset chooser
 		SortedMap<String, Charset> availableCharset = 

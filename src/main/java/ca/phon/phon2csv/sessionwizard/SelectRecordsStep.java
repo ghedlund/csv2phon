@@ -92,7 +92,7 @@ public class SelectRecordsStep extends WizardStep {
 		dirPanel.add(new JLabel("Save as:"), cc.xy(1,1));
 		saveLocationField = new FileSelectionField();
 		saveLocationField.setMode(SelectionMode.FILES);
-		saveLocationField.setEditable(false);
+		saveLocationField.getTextField().setEditable(false);
 		saveLocationField.setFileFilter(FileFilter.csvFilter);
 		saveLocationField.setFile(new File(getDefaultSaveLocation()));
 		

@@ -93,7 +93,7 @@ public class CSVDirectoryStep extends WizardStep {
 		
 		csvDirField = new FileSelectionField();
 		csvDirField.setMode(SelectionMode.FOLDERS);
-		csvDirField.setEditable(false);
+		csvDirField.getTextField().setEditable(false);
 		
 		dirPanel.add(csvDirField, cc.xyw(3,3,2));
 		
