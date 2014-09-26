@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JSeparator;
 
 import ca.phon.app.project.ProjectFrame;
 import ca.phon.app.project.ProjectWindow;
@@ -74,6 +75,7 @@ public class Phon2CSVMenuHandler
 			final PhonUIAction saveAsCsvAct = new PhonUIAction(this, "session2CsvWizard", owner);
 			saveAsCsvAct.putValue(PhonUIAction.NAME, "Save as CSV...");
 			saveAsCsvAct.putValue(PhonUIAction.SHORT_DESCRIPTION, "Save session as CSV");
+			fileMenu.add(new JSeparator(), 0);
 			fileMenu.add(new JMenuItem(saveAsCsvAct), 0);
 		}
 	}
