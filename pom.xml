@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>ca.phon</groupId>
   <artifactId>phon-csv-plugin</artifactId>
-  <version>2</version>
+  <version>3</version>
   <name>phon-csv-plugin</name>
   
   <organization>
@@ -77,7 +77,7 @@
       <dependency>
           <groupId>ca.phon</groupId>
           <artifactId>phon-app</artifactId>
-          <version>2.0beta1</version>
+          <version>2.0.0</version>
       </dependency>
   </dependencies>
   
