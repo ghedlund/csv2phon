@@ -38,6 +38,7 @@ import ca.phon.csv2phon.io.ColumnMapType;
 import ca.phon.csv2phon.io.FileType;
 import ca.phon.csv2phon.io.ImportDescriptionType;
 import ca.phon.csv2phon.io.ParticipantType;
+import ca.phon.extensions.UnvalidatedValue;
 import ca.phon.fontconverter.TranscriptConverter;
 import ca.phon.ipa.IPATranscript;
 import ca.phon.ipa.IPATranscriptBuilder;
@@ -281,8 +282,15 @@ public class CSVImporter {
 						if(systemTier == SystemTierType.Orthography) {
 							final Tier<Orthography> orthoTier = utt.getOrthography();
 							for(String grpVal:rowVals) {
-								final Orthography ortho = Orthography.parseOrthography(grpVal);
-								orthoTier.addGroup(ortho);
+								try {
+									final Orthography ortho = Orthography.parseOrthography(grpVal);
+									orthoTier.addGroup(ortho);
+								} catch (ParseException e) {
+									final Orthography ortho = new Orthography();
+									final UnvalidatedValue uv = new UnvalidatedValue(grpVal, e);
+									ortho.putExtension(UnvalidatedValue.class, uv);
+									orthoTier.addGroup(ortho);
+								}
 							}
 						} else if(systemTier == SystemTierType.IPATarget 
 								|| systemTier == SystemTierType.IPAActual) {

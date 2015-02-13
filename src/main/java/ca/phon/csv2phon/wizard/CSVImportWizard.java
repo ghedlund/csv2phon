@@ -224,7 +224,6 @@ public class CSVImportWizard extends WizardFrame {
 		} else if(super.getCurrentStep() == sessionInfoStep) {
 			columnMapStep.setBase(dirStep.getBase().getAbsolutePath());
 			columnMapStep.setSettings(importDescription);
-			
 			partsStep.setSettings(importDescription);
 		} else if(super.getCurrentStep() == columnMapStep) {
 			// start import
