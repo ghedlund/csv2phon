@@ -47,9 +47,11 @@ public class CSVParticipantUtil {
 		retVal.setGroup(part.getGroup());
 		
 		final String lang = part.getLanguage();
-		final String langs[] = lang.split(",");
-		for(String l:langs) {
-			retVal.getLanguage().add(StringUtils.strip(l));
+		if(lang != null) {
+			final String langs[] = lang.split(",");
+			for(String l:langs) {
+				retVal.getLanguage().add(StringUtils.strip(l));
+			}
 		}
 
 		retVal.setSex(part.getSex() == Sex.MALE ? SexType.MALE : SexType.FEMALE);

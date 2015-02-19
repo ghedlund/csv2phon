@@ -44,7 +44,7 @@ public class SpeakerInfoColumn implements CSVExportColumn {
 		if(speaker != null) {
 			String retVal = "";
 			if(field.equalsIgnoreCase("name")) {
-				retVal = speaker.getName();
+				retVal = speaker.toString();
 			} else if(field.equalsIgnoreCase("age")) {
 				if(t.getDate() != null && speaker.getBirthDate() != null) {
 					final AgeFormatter ageFormatter = new AgeFormatter();
