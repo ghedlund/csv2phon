@@ -18,12 +18,14 @@
 package ca.phon.csv2phon.wizard;
 
 import java.awt.BorderLayout;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
 import java.nio.charset.Charset;
+import java.util.Optional;
 import java.util.SortedMap;
 
 import javax.swing.BorderFactory;
@@ -33,7 +35,13 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.PlainDocument;
 
 import ca.phon.ui.decorations.DialogHeader;
 import ca.phon.ui.nativedialogs.NativeDialogs;
@@ -62,6 +70,14 @@ public class DirectoryStep extends CSVImportStep {
 	
 	private String charsetName = "UTF-8";
 	
+	private char fieldDelim = ',';
+	
+	private JTextField fieldDelimField;
+	
+	private char textDelim = '"';
+	
+	private JTextField textDelimField;
+	
 	public DirectoryStep() {
 		init();
 	}
@@ -75,7 +91,7 @@ public class DirectoryStep extends CSVImportStep {
 		centerPanel.setBorder(BorderFactory.createTitledBorder("Folder"));
 		FormLayout layout = new FormLayout(
 				"right:pref, 3dlu, fill:pref:grow, pref",
-				"pref, 3dlu, pref, 3dlu, pref");
+				"pref, 3dlu, pref, 3dlu, pref, 3dlu, pref, 3dlu, pref");
 		CellConstraints cc = new CellConstraints();
 		centerPanel.setLayout(layout);
 		
@@ -104,11 +120,25 @@ public class DirectoryStep extends CSVImportStep {
 		});
 		charsetBox.setSelectedItem("UTF-8");
 		
+		textDelimField = new JTextField();
+		textDelimField.setDocument(new SingleCharDocument());
+		textDelimField.setText(textDelim+"");
+		
+		fieldDelimField = new JTextField();
+		fieldDelimField.setDocument(new SingleCharDocument());
+		fieldDelimField.setText(fieldDelim+"");
+		
 		centerPanel.add(new JLabel("Folder:"), cc.xy(1,3));
 		centerPanel.add(csvDirField, cc.xyw(3,3,2));
 		
 		centerPanel.add(new JLabel("File encoding:"), cc.xy(1, 5));
 		centerPanel.add(charsetBox, cc.xy(3, 5));
+		
+		centerPanel.add(new JLabel("Field delimiter:"), cc.xy(1,7));
+		centerPanel.add(fieldDelimField, cc.xy(3, 7));
+		
+		centerPanel.add(new JLabel("Text delimiter:"), cc.xy(1, 9));
+		centerPanel.add(textDelimField, cc.xy(3, 9));
 		
 		add(centerPanel, BorderLayout.CENTER);
 	}
@@ -132,6 +162,30 @@ public class DirectoryStep extends CSVImportStep {
 
 	public String getFileEncoding()  {
 		return this.charsetName;
+	}
+	
+	public Optional<Character> getTextDelimiter() {
+		return Optional.ofNullable((textDelimField.getText().length() > 0 ?
+				textDelimField.getText().charAt(0) : null));
+	}
+	
+	public Optional<Character> getFieldDelimiter() {
+		return Optional.ofNullable((fieldDelimField.getText().length() > 0 ?
+				fieldDelimField.getText().charAt(0) : null));
+	}
+	
+	private final class SingleCharDocument extends PlainDocument {
+
+		@Override
+		public void insertString(int offs, String str, AttributeSet a)
+				throws BadLocationException {
+			if(getLength() > 0) {
+				Toolkit.getDefaultToolkit().beep();
+			} else {
+				super.insertString(0, (str.length() > 0 ? str.substring(0, 1) : str), a);
+			}
+		}
+
 	}
 	
 }

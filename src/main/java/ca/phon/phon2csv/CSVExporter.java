@@ -97,7 +97,6 @@ public class CSVExporter {
 			
 			CSVWriter writer = new CSVWriter(fWriter, ',', '\"', 
 					(OSInfo.isWindows() ? "\r\n" : "\n"));
-			//CSVWriter writer = new CSVWriter(new OutputStreamWriter(new FileOutputStream(exportFile), "UTF-8"));
 			
 			// write header line
 			List<String> line = new ArrayList<String>();

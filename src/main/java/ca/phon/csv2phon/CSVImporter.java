@@ -51,6 +51,7 @@ import ca.phon.session.MediaSegment;
 import ca.phon.session.MediaSegmentFormatter;
 import ca.phon.session.MediaUnit;
 import ca.phon.session.Participant;
+import ca.phon.session.ParticipantRole;
 import ca.phon.session.Record;
 import ca.phon.session.Session;
 import ca.phon.session.SessionFactory;
@@ -83,6 +84,10 @@ public class CSVImporter {
 	
 	private String fileEncoding = "UTF-8";
 	
+	private char textDelimChar = '"';
+	
+	private char fieldDelimChar = ',';
+	
 	/**
 	 * Constructor.
 	 */
@@ -102,6 +107,22 @@ public class CSVImporter {
 		return this.fileEncoding;
 	}
 	
+	public char getTextDelimChar() {
+		return textDelimChar;
+	}
+
+	public void setTextDelimChar(char textDelimChar) {
+		this.textDelimChar = textDelimChar;
+	}
+
+	public char getFieldDelimChar() {
+		return fieldDelimChar;
+	}
+
+	public void setFieldDelimChar(char fieldDelimChar) {
+		this.fieldDelimChar = fieldDelimChar;
+	}
+
 	/**
 	 * Begin import of specified files.
 	 */
@@ -153,7 +174,7 @@ public class CSVImporter {
 		
 		final InputStreamReader csvInputReader = new InputStreamReader(new FileInputStream(csvFile), fileEncoding);
 		// read in csv file
-		final CSVReader reader = new CSVReader(csvInputReader, ',', '\"');
+		final CSVReader reader = new CSVReader(csvInputReader, fieldDelimChar, textDelimChar);
 		
 		// create a new transcript in the project 
 		// with the specified corpus and session name
@@ -203,6 +224,7 @@ public class CSVImporter {
 			}
 		}
 		
+		int createdParticipant = 0;
 		String[] currentRow = null;
 		while((currentRow = reader.readNext()) != null) {
 			
@@ -230,7 +252,7 @@ public class CSVImporter {
 					}
 				}
 				
-				String phontier = colmap.getPhontier();
+				String phontier = colmap.getPhontier().trim();
 				if(phontier.equalsIgnoreCase("Don't Import")) {
 					continue;
 				}
@@ -246,7 +268,7 @@ public class CSVImporter {
 					// look for the participant in the transcript
 					Participant speaker = null;
 					for(Participant p:t.getParticipants()) {
-						if(p.getName().equals(rowval)) {
+						if(p.toString().equals(rowval)) {
 							speaker = p;
 							break;
 						}
@@ -258,6 +280,12 @@ public class CSVImporter {
 					if(speaker == null) {
 						speaker = factory.createParticipant();
 						speaker.setName(rowval);
+						speaker.setRole(ParticipantRole.PARTICIPANT);
+						
+						String id = "PA" + (createdParticipant > 0 ? createdParticipant : "R");
+						++createdParticipant;
+						speaker.setId(id);
+						
 						t.addParticipant(speaker);
 					}
 

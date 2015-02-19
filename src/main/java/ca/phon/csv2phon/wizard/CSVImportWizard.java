@@ -154,6 +154,8 @@ public class CSVImportWizard extends WizardFrame {
 				CSVImporter importer =
 					new CSVImporter(dirStep.getBase().getAbsolutePath(), importDescription, getProject());
 				importer.setFileEncoding(dirStep.getFileEncoding());
+				importer.setTextDelimChar(dirStep.getTextDelimiter().orElse('\0'));
+				importer.setFieldDelimChar(dirStep.getFieldDelimiter().orElse('\0'));
 				importer.performImport();
 				
 				SwingUtilities.invokeLater(turnOnBack);
