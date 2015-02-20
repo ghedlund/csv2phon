@@ -2,7 +2,6 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>ca.phon</groupId>
   <artifactId>phon-csv-plugin</artifactId>
-  <version>5</version>
   <name>phon-csv-plugin</name>
   
   <organization>
@@ -98,6 +97,7 @@
       <plugin>
         <groupId>org.jvnet.jaxb2.maven2</groupId>
         <artifactId>maven-jaxb2-plugin</artifactId>
+        <version>0.10.0</version>
         <executions>
           <execution>
             <id>generate</id>
@@ -116,4 +116,5 @@
     </plugins>
   </build>
   
+  <version>6</version>
 </project>
