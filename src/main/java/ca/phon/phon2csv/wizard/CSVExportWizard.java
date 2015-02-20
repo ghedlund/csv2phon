@@ -18,16 +18,22 @@
 package ca.phon.phon2csv.wizard;
 
 import java.awt.BorderLayout;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Handler;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import ca.phon.app.log.BufferPanel;
+import ca.phon.app.log.LogBuffer;
 import ca.phon.phon2csv.CSVExportColumn;
 import ca.phon.phon2csv.CSVExporter;
 import ca.phon.project.Project;
@@ -36,6 +42,7 @@ import ca.phon.session.SessionPath;
 import ca.phon.ui.CommonModuleFrame;
 import ca.phon.ui.PhonLoggerConsole;
 import ca.phon.ui.decorations.DialogHeader;
+import ca.phon.ui.toast.ToastFactory;
 import ca.phon.ui.wizard.WizardFrame;
 import ca.phon.ui.wizard.WizardStep;
 import ca.phon.worker.PhonWorker;
@@ -54,7 +61,7 @@ public class CSVExportWizard extends WizardFrame {
 	private CSVDirectoryStep dirStep;
 	private CSVColumnsStep colStep;
 	private WizardStep exportStep;
-	private PhonLoggerConsole console;
+	private BufferPanel bufferPanel;
 	
 	/**
 	 * Constructor
@@ -92,13 +99,9 @@ public class CSVExportWizard extends WizardFrame {
 		DialogHeader exportHeader = new DialogHeader("CSV Export", "Exporting data.");
 		exportPanel.add(exportHeader, BorderLayout.NORTH);
 		
-		JPanel consolePanel = new JPanel(new BorderLayout());
+		bufferPanel = new BufferPanel("CSV Export");
 		
-		console = new PhonLoggerConsole();
-		console.addLogger(Logger.getLogger("ca.phon.phon2csv"));
-		consolePanel.add(console, BorderLayout.CENTER);
-		
-		exportPanel.add(consolePanel, BorderLayout.CENTER);
+		exportPanel.add(bufferPanel, BorderLayout.CENTER);
 		
 		return super.addWizardStep(exportPanel);
 	}
@@ -107,10 +110,12 @@ public class CSVExportWizard extends WizardFrame {
 		return getExtension(Project.class);
 	}
 	
-	private void startExport() {
+	private void startExport() throws IOException {
 		PhonWorker worker = PhonWorker.createWorker();
 		worker.setName("CSV Exporter");
 		worker.setFinishWhenQueueEmpty(true);
+		
+		final BufferedWriter out = new BufferedWriter(new OutputStreamWriter(bufferPanel.getLogBuffer().getStdOutStream(), "UTF-8"));
 		
 		Runnable r = new Runnable() {
 			@Override
@@ -120,7 +125,12 @@ public class CSVExportWizard extends WizardFrame {
 					public void run() {
 						btnBack.setEnabled(false);
 						btnCancel.setEnabled(false);
-						showBusyLabel(console);
+						
+						try {
+							out.flush();
+							out.write(LogBuffer.ESCAPE_CODE_PREFIX + BufferPanel.SHOW_BUSY);
+							out.flush();
+						} catch (IOException e) {}
 					}
 				};
 				Runnable turnOnBack = new Runnable() {
@@ -128,7 +138,12 @@ public class CSVExportWizard extends WizardFrame {
 					public void run() {
 						btnBack.setEnabled(true);
 						btnCancel.setEnabled(true);
-						stopBusyLabel();
+						
+						try {
+							out.flush();
+							out.write(LogBuffer.ESCAPE_CODE_PREFIX + BufferPanel.STOP_BUSY);
+							out.flush();
+						} catch (IOException e) {}
 					}
 				};
 				SwingUtilities.invokeLater(turnOffBack);
@@ -141,9 +156,33 @@ public class CSVExportWizard extends WizardFrame {
 				CSVExporter exporter = 
 					new CSVExporter(cols);
 				
+				Handler logHandler = new Handler() {
+					
+					@Override
+					public void publish(LogRecord record) {
+						try {
+							out.write(record.getMessage() + "\n");
+							out.flush();
+						} catch (IOException e) {}
+					}
+					
+					@Override
+					public void flush() {
+						
+					}
+					
+					@Override
+					public void close() throws SecurityException {
+						
+					}
+				};
+				Logger logger = Logger.getLogger(CSVExporter.class.getName());
+				logger.addHandler(logHandler);
+				LOGGER.addHandler(logHandler);
+				
 				Project proj = getProject();
-				LOGGER.info("Writing files to directory '" + dirStep.getBase() + "'");
-				LOGGER.info("Files will be written using encoding 'UTF-8'");
+				bufferPanel.getLogBuffer().append("Writing files to directory '" + dirStep.getBase() + "'");
+				bufferPanel.getLogBuffer().append("Files will be written using encoding 'UTF-8'");
 				
 				List<SessionPath> sessions = dirStep.getSelectedSessions();
 				for(SessionPath loc:sessions) {
@@ -161,6 +200,9 @@ public class CSVExportWizard extends WizardFrame {
 				
 				LOGGER.info("Export complete.");
 				
+				logger.removeHandler(logHandler);
+				LOGGER.removeHandler(logHandler);
+				
 				SwingUtilities.invokeLater(turnOnBack);
 			}
 		};
@@ -173,7 +215,12 @@ public class CSVExportWizard extends WizardFrame {
 	protected void next() {
 		if(super.getCurrentStep() == colStep) {
 			// start export thread
-			startExport();
+			try {
+				startExport();
+			} catch (IOException e) {
+				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+				ToastFactory.makeToast(e.getLocalizedMessage()).start(colStep);
+			}
 		}
 		super.next();
 	}
