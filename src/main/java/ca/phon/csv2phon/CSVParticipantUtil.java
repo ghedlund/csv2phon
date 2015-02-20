@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.apache.commons.lang3.StringUtils;
@@ -38,6 +39,17 @@ public class CSVParticipantUtil {
 				final XMLGregorianCalendar cal = df.newXMLGregorianCalendar(bday.toGregorianCalendar());
 				cal.setTimezone(DatatypeConstants.FIELD_UNDEFINED);
 				retVal.setBirthday(cal);
+			} catch (DatatypeConfigurationException e) {
+				LOGGER.log(Level.WARNING, e.toString(), e);
+			}
+		}
+		
+		final Period age = part.getAge(null);
+		if(age != null) {
+			try {
+				final DatatypeFactory df = DatatypeFactory.newInstance();
+				final Duration ageDuration = df.newDuration(true, age.getYears(), age.getMonths(), age.getDays(), 0, 0, 0);
+				retVal.setAge(ageDuration);
 			} catch (DatatypeConfigurationException e) {
 				LOGGER.log(Level.WARNING, e.toString(), e);
 			}
@@ -80,6 +92,13 @@ public class CSVParticipantUtil {
 			// calculate age up to the session date
 			final Period period = new Period(bdt, sessionDate);
 			retVal.setAgeTo(period);
+		}
+		
+		final Duration ageDuration = pt.getAge();
+		if(ageDuration != null) {
+			// convert to period
+			final Period age = Period.parse(ageDuration.toString());
+			retVal.setAge(age);
 		}
 		
 		retVal.setEducation(pt.getEducation());
