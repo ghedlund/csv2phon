@@ -18,7 +18,13 @@
 package ca.phon.csv2phon.wizard;
 
 import java.awt.BorderLayout;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import javax.swing.JPanel;
@@ -30,12 +36,15 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
 
+import ca.phon.app.log.BufferPanel;
+import ca.phon.app.log.LogBuffer;
 import ca.phon.csv2phon.CSVImporter;
 import ca.phon.csv2phon.io.ImportDescriptionType;
 import ca.phon.csv2phon.io.ObjectFactory;
 import ca.phon.project.Project;
 import ca.phon.ui.PhonLoggerConsole;
 import ca.phon.ui.decorations.DialogHeader;
+import ca.phon.ui.toast.ToastFactory;
 import ca.phon.ui.wizard.WizardFrame;
 import ca.phon.ui.wizard.WizardStep;
 import ca.phon.worker.PhonWorker;
@@ -59,7 +68,7 @@ public class CSVImportWizard extends WizardFrame {
 	private ColumnMapStep columnMapStep;
 	private WizardStep importStep;
 	
-	private PhonLoggerConsole console;
+	private BufferPanel bufferPanel;
 	
 	private final String settingsFileName = "importsettings.xml";
 	
@@ -113,21 +122,21 @@ public class CSVImportWizard extends WizardFrame {
 		importPanel.add(importHeader, BorderLayout.NORTH);
 		
 		JPanel consolePanel = new JPanel(new BorderLayout());
-//		consolePanel.setBorder(BorderFactory.createTitledBorder("Console"));
 		
-		console = new PhonLoggerConsole();
-		consolePanel.add(console, BorderLayout.CENTER);
-		console.addLogger(LOGGER);
+		bufferPanel = new BufferPanel("CVS Import");
+		consolePanel.add(bufferPanel, BorderLayout.CENTER);
 		
 		importPanel.add(consolePanel, BorderLayout.CENTER);
 		
 		return super.addWizardStep(importPanel);
 	}
 	
-	private void startImport() {
+	private void startImport() throws IOException {
 		PhonWorker worker = PhonWorker.createWorker();
 		worker.setName("CSV Importer");
 		worker.setFinishWhenQueueEmpty(true);
+		
+		final BufferedWriter out = new BufferedWriter(new OutputStreamWriter(bufferPanel.getLogBuffer().getStdOutStream(), "UTF-8"));
 		
 		Runnable r = new Runnable() {
 			@Override
@@ -137,7 +146,12 @@ public class CSVImportWizard extends WizardFrame {
 					public void run() {
 						btnBack.setEnabled(false);
 						btnCancel.setEnabled(false);
-						showBusyLabel(console);
+						
+						try {
+							out.flush();
+							out.write(LogBuffer.ESCAPE_CODE_PREFIX + BufferPanel.SHOW_BUSY);
+							out.flush();
+						} catch (IOException e) {}
 					}
 				};
 				Runnable turnOnBack = new Runnable() {
@@ -145,7 +159,12 @@ public class CSVImportWizard extends WizardFrame {
 					public void run() {
 						btnBack.setEnabled(true);
 						btnCancel.setEnabled(true);
-						stopBusyLabel();
+						
+						try {
+							out.flush();
+							out.write(LogBuffer.ESCAPE_CODE_PREFIX + BufferPanel.STOP_BUSY);
+							out.flush();
+						} catch (IOException e) {}
 					}
 				};
 				SwingUtilities.invokeLater(turnOffBack);
@@ -153,10 +172,36 @@ public class CSVImportWizard extends WizardFrame {
 				saveSettings();
 				CSVImporter importer =
 					new CSVImporter(dirStep.getBase().getAbsolutePath(), importDescription, getProject());
+				
+				Handler logHandler = new Handler() {
+					
+					@Override
+					public void publish(LogRecord record) {
+						try {
+							out.write(record.getMessage() + "\n");
+							out.flush();
+						} catch (IOException e) {}
+					}
+					
+					@Override
+					public void flush() {
+						
+					}
+					
+					@Override
+					public void close() throws SecurityException {
+						
+					}
+				};
+				Logger importLogger = Logger.getLogger(CSVImporter.class.getName());
+				importLogger.addHandler(logHandler);
+				
 				importer.setFileEncoding(dirStep.getFileEncoding());
 				importer.setTextDelimChar(dirStep.getTextDelimiter().orElse('\0'));
 				importer.setFieldDelimChar(dirStep.getFieldDelimiter().orElse('\0'));
 				importer.performImport();
+				
+				importLogger.removeHandler(logHandler);
 				
 				SwingUtilities.invokeLater(turnOnBack);
 			}
@@ -229,7 +274,12 @@ public class CSVImportWizard extends WizardFrame {
 			partsStep.setSettings(importDescription);
 		} else if(super.getCurrentStep() == columnMapStep) {
 			// start import
-			startImport();
+			try {
+				startImport();
+			} catch (IOException e) {
+				ToastFactory.makeToast(e.getMessage()).start(columnMapStep);
+				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+			}
 		}
 		super.next();
 	}
