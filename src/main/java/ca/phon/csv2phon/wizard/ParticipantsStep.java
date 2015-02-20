@@ -179,6 +179,9 @@ public class ParticipantsStep extends CSVImportStep {
 			Participant part = getParticipants().get(selectedRow);
 			
 			ParticipantEditor.editParticipant(CommonModuleFrame.getCurrentFrame(), part, getParticipants());
+			
+			ParticipantType pt = CSVParticipantUtil.copyPhonParticipant(new ObjectFactory(), part);
+			getSettings().getParticipant().set(selectedRow, pt);
 		
 			((ParticipantsTableModel)participantTable.getModel()).fireTableDataChanged();
 		}
