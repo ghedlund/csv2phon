@@ -5,7 +5,6 @@ import java.awt.Window;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 
-import ca.phon.app.project.ProjectFrame;
 import ca.phon.app.project.ProjectWindow;
 import ca.phon.csv2phon.wizard.CSVImportWizard;
 import ca.phon.plugin.IPluginExtensionFactory;
@@ -56,14 +55,14 @@ public class CSV2PhonMenuHandler
 		}
 		
 		if(pluginsMenu != null) {
-			final PhonUIAction csv2PhonAct = new PhonUIAction(this, "cvs2PhonWizard", cmf);
+			final PhonUIAction csv2PhonAct = new PhonUIAction(CSV2PhonMenuHandler.class, "csv2PhonWizard", cmf);
 			csv2PhonAct.putValue(PhonUIAction.NAME, "Import from CSV...");
 			csv2PhonAct.putValue(PhonUIAction.SHORT_DESCRIPTION, "Import CSV files as new Sessions in the current project.");
 			pluginsMenu.add(csv2PhonAct);
 		}
 	}
 	
-	public void cvs2PhonWizard(PhonActionEvent pae) {
+	public static void csv2PhonWizard(PhonActionEvent pae) {
 		final ProjectWindow pw = (ProjectWindow)pae.getData();
 		final Project project = pw.getProject();
 		if(project == null) return;

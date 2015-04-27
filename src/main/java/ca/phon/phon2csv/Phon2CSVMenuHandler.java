@@ -8,10 +8,8 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
 
-import ca.phon.app.project.ProjectFrame;
 import ca.phon.app.project.ProjectWindow;
 import ca.phon.app.session.editor.SessionEditor;
-import ca.phon.app.session.editor.actions.SaveSessionAction;
 import ca.phon.phon2csv.sessionwizard.SessionCSVExportWizard;
 import ca.phon.phon2csv.wizard.CSVExportWizard;
 import ca.phon.plugin.IPluginExtensionFactory;
@@ -19,8 +17,6 @@ import ca.phon.plugin.IPluginExtensionPoint;
 import ca.phon.plugin.IPluginMenuFilter;
 import ca.phon.plugin.PhonPlugin;
 import ca.phon.project.Project;
-import ca.phon.session.Session;
-import ca.phon.ui.CommonModuleFrame;
 import ca.phon.ui.action.PhonActionEvent;
 import ca.phon.ui.action.PhonUIAction;
 
@@ -63,7 +59,7 @@ public class Phon2CSVMenuHandler
 			}
 			
 			if(pluginsMenu != null) {
-				final PhonUIAction csv2PhonAct = new PhonUIAction(this, "phon2CsvWizard", owner);
+				final PhonUIAction csv2PhonAct = new PhonUIAction(Phon2CSVMenuHandler.class, "phon2CsvWizard", owner);
 				csv2PhonAct.putValue(PhonUIAction.NAME, "Export to CSV...");
 				csv2PhonAct.putValue(PhonUIAction.SHORT_DESCRIPTION, "Export Phon sessions as CSV");
 				pluginsMenu.add(csv2PhonAct);
@@ -72,7 +68,7 @@ public class Phon2CSVMenuHandler
 			JMenu fileMenu = menuBar.getMenu(0);
 			if(fileMenu == null) return;
 		
-			final PhonUIAction saveAsCsvAct = new PhonUIAction(this, "session2CsvWizard", owner);
+			final PhonUIAction saveAsCsvAct = new PhonUIAction(Phon2CSVMenuHandler.class, "session2CsvWizard", owner);
 			saveAsCsvAct.putValue(PhonUIAction.NAME, "Save as CSV...");
 			saveAsCsvAct.putValue(PhonUIAction.SHORT_DESCRIPTION, "Save session as CSV");
 			fileMenu.add(new JSeparator(), 0);
@@ -80,7 +76,7 @@ public class Phon2CSVMenuHandler
 		}
 	}
 	
-	public void phon2CsvWizard(PhonActionEvent pae) {
+	public static void phon2CsvWizard(PhonActionEvent pae) {
 		final ProjectWindow pw = (ProjectWindow)pae.getData();
 		final Project project = pw.getProject();
 		if(project == null) return;
@@ -91,7 +87,7 @@ public class Phon2CSVMenuHandler
 		wizard.showWizard();
 	}
 
-	public void session2CsvWizard(PhonActionEvent pae) {
+	public static void session2CsvWizard(PhonActionEvent pae) {
 		final SessionEditor sessionEditor = (SessionEditor)pae.getData();
 		
 		final SessionCSVExportWizard wizard = 
