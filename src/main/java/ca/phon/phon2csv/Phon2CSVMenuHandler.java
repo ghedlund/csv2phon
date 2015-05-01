@@ -59,7 +59,8 @@ public class Phon2CSVMenuHandler
 			}
 			
 			if(pluginsMenu != null) {
-				final PhonUIAction csv2PhonAct = new PhonUIAction(Phon2CSVMenuHandler.class, "phon2CsvWizard", owner);
+				final PhonUIAction csv2PhonAct = new PhonUIAction(Phon2CSVMenuHandler.class, "phon2CsvWizard");
+				csv2PhonAct.setData(owner);
 				csv2PhonAct.putValue(PhonUIAction.NAME, "Export to CSV...");
 				csv2PhonAct.putValue(PhonUIAction.SHORT_DESCRIPTION, "Export Phon sessions as CSV");
 				pluginsMenu.add(csv2PhonAct);
@@ -68,7 +69,8 @@ public class Phon2CSVMenuHandler
 			JMenu fileMenu = menuBar.getMenu(0);
 			if(fileMenu == null) return;
 		
-			final PhonUIAction saveAsCsvAct = new PhonUIAction(Phon2CSVMenuHandler.class, "session2CsvWizard", owner);
+			final PhonUIAction saveAsCsvAct = new PhonUIAction(Phon2CSVMenuHandler.class, "session2CsvWizard");
+			saveAsCsvAct.setData(owner);
 			saveAsCsvAct.putValue(PhonUIAction.NAME, "Save as CSV...");
 			saveAsCsvAct.putValue(PhonUIAction.SHORT_DESCRIPTION, "Save session as CSV");
 			fileMenu.add(new JSeparator(), 0);

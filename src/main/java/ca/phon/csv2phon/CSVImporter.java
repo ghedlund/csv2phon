@@ -58,6 +58,7 @@ import ca.phon.session.SessionFactory;
 import ca.phon.session.SystemTierType;
 import ca.phon.session.Tier;
 import ca.phon.session.TierDescription;
+import ca.phon.session.TierViewItem;
 import ca.phon.syllabifier.Syllabifier;
 import ca.phon.syllabifier.SyllabifierLibrary;
 import ca.phon.util.Language;
@@ -220,6 +221,11 @@ public class CSVImporter {
 					final TierDescription tierDesc =
 							factory.createTierDescription(tierName, colmap.isGrouped(), String.class);
 					t.addUserTier(tierDesc);
+					
+					final TierViewItem tvi = factory.createTierViewItem(tierName);
+					final List<TierViewItem> tierView = new ArrayList<>(t.getTierView());
+					tierView.add(tvi);
+					t.setTierView(tierView);
 				}
 			}
 		}

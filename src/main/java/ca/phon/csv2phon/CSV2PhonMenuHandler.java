@@ -55,7 +55,8 @@ public class CSV2PhonMenuHandler
 		}
 		
 		if(pluginsMenu != null) {
-			final PhonUIAction csv2PhonAct = new PhonUIAction(CSV2PhonMenuHandler.class, "csv2PhonWizard", cmf);
+			final PhonUIAction csv2PhonAct = new PhonUIAction(CSV2PhonMenuHandler.class, "csv2PhonWizard");
+			csv2PhonAct.setData(cmf);
 			csv2PhonAct.putValue(PhonUIAction.NAME, "Import from CSV...");
 			csv2PhonAct.putValue(PhonUIAction.SHORT_DESCRIPTION, "Import CSV files as new Sessions in the current project.");
 			pluginsMenu.add(csv2PhonAct);
