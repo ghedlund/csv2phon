@@ -420,7 +420,7 @@ public class ColumnMapStep extends CSVImportStep {
 			actualSyllabifierBox = new JComboBox(sortedSyllabifiers.toArray(new Syllabifier[0]));
 			actualSyllabifierBox.setRenderer(new SyllabifierCellRenderer());
 			if(defSyllabifier != null)
-				targetSyllabifierBox.setSelectedItem(defSyllabifier);
+				actualSyllabifierBox.setSelectedItem(defSyllabifier);
 			actualSyllabifierBox.addItemListener(syllabifierListener);
 			
 			depTierField = new JTextField();
