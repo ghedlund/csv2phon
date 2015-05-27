@@ -145,7 +145,7 @@ public class CSVImporter {
 		LOGGER.info("Import finished.");
 	}
 	
-	private void importFile(FileType fileInfo) 
+	public void importFile(FileType fileInfo) 
 		throws IOException {
 		// first try relative path from base
 //		String base = importDescription.getBase();
@@ -361,8 +361,12 @@ public class CSVImporter {
 							utt.putTier(tier);
 						}
 						
-						for(String grpVal:rowVals) {
-							tier.addGroup(grpVal);
+						if(tier.isGrouped()) {
+							for(String grpVal:rowVals) {
+								tier.addGroup(grpVal);
+							}
+						} else {
+							tier.setGroup(0, rowval);
 						}
 					}
 				}
