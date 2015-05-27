@@ -18,6 +18,8 @@
 package ca.phon.csv2phon.wizard;
 
 import java.awt.BorderLayout;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
@@ -39,14 +41,15 @@ import javax.xml.bind.Unmarshaller;
 import ca.phon.app.log.BufferPanel;
 import ca.phon.app.log.LogBuffer;
 import ca.phon.csv2phon.CSVImporter;
+import ca.phon.csv2phon.io.FileType;
 import ca.phon.csv2phon.io.ImportDescriptionType;
 import ca.phon.csv2phon.io.ObjectFactory;
 import ca.phon.project.Project;
-import ca.phon.ui.PhonLoggerConsole;
 import ca.phon.ui.decorations.DialogHeader;
 import ca.phon.ui.toast.ToastFactory;
 import ca.phon.ui.wizard.WizardFrame;
 import ca.phon.ui.wizard.WizardStep;
+import ca.phon.worker.PhonTask;
 import ca.phon.worker.PhonWorker;
 
 /**
@@ -73,6 +76,8 @@ public class CSVImportWizard extends WizardFrame {
 	private final String settingsFileName = "importsettings.xml";
 	
 	private final Project project;
+	
+	private ImportTask importTask;
 	
 	public CSVImportWizard(Project project) {
 		super("CSV Import");
@@ -113,6 +118,17 @@ public class CSVImportWizard extends WizardFrame {
 		importStep = createImportStep();
 		importStep.setPrevStep(3);
 		importStep.setNextStep(-1);
+		
+		addWindowListener(new WindowAdapter() {
+
+			@Override
+			public void windowClosing(WindowEvent e) {
+				if(importTask != null) {
+					importTask.shutdown();
+				}
+			}
+			
+		});
 	}
 	
 	private WizardStep createImportStep() {
@@ -137,78 +153,9 @@ public class CSVImportWizard extends WizardFrame {
 		worker.setFinishWhenQueueEmpty(true);
 		
 		final BufferedWriter out = new BufferedWriter(new OutputStreamWriter(bufferPanel.getLogBuffer().getStdOutStream(), "UTF-8"));
+	    importTask = new ImportTask(out);
 		
-		Runnable r = new Runnable() {
-			@Override
-			public void run() {
-				Runnable turnOffBack = new Runnable() {
-					@Override
-					public void run() {
-						btnBack.setEnabled(false);
-						btnCancel.setEnabled(false);
-						
-						try {
-							out.flush();
-							out.write(LogBuffer.ESCAPE_CODE_PREFIX + BufferPanel.SHOW_BUSY);
-							out.flush();
-						} catch (IOException e) {}
-					}
-				};
-				Runnable turnOnBack = new Runnable() {
-					@Override
-					public void run() {
-						btnBack.setEnabled(true);
-						btnCancel.setEnabled(true);
-						
-						try {
-							out.flush();
-							out.write(LogBuffer.ESCAPE_CODE_PREFIX + BufferPanel.STOP_BUSY);
-							out.flush();
-						} catch (IOException e) {}
-					}
-				};
-				SwingUtilities.invokeLater(turnOffBack);
-				
-				saveSettings();
-				CSVImporter importer =
-					new CSVImporter(dirStep.getBase().getAbsolutePath(), importDescription, getProject());
-				
-				Handler logHandler = new Handler() {
-					
-					@Override
-					public void publish(LogRecord record) {
-						try {
-							out.write(record.getMessage() + "\n");
-							out.flush();
-						} catch (IOException e) {}
-					}
-					
-					@Override
-					public void flush() {
-						
-					}
-					
-					@Override
-					public void close() throws SecurityException {
-						
-					}
-				};
-				Logger importLogger = Logger.getLogger(CSVImporter.class.getName());
-				importLogger.addHandler(logHandler);
-				
-				importer.setFileEncoding(dirStep.getFileEncoding());
-				importer.setTextDelimChar(dirStep.getTextDelimiter().orElse('\0'));
-				importer.setFieldDelimChar(dirStep.getFieldDelimiter().orElse('\0'));
-				importer.performImport();
-				
-				importLogger.removeHandler(logHandler);
-				
-				SwingUtilities.invokeLater(turnOnBack);
-			}
-		};
-		
-		
-		worker.invokeLater(r);
+		worker.invokeLater(importTask);
 		worker.start();
 	}
 	
@@ -282,6 +229,94 @@ public class CSVImportWizard extends WizardFrame {
 			}
 		}
 		super.next();
+	}
+	
+	private final class ImportTask extends PhonTask {
+		
+		private BufferedWriter out;
+		
+		
+		public ImportTask(BufferedWriter out) {
+			this.out = out;
+		}
+
+		@Override
+		public void performTask() {
+			Runnable turnOffBack = new Runnable() {
+				@Override
+				public void run() {
+					btnBack.setEnabled(false);
+					btnCancel.setEnabled(false);
+					
+					try {
+						out.flush();
+						out.write(LogBuffer.ESCAPE_CODE_PREFIX + BufferPanel.SHOW_BUSY);
+						out.flush();
+					} catch (IOException e) {}
+				}
+			};
+			Runnable turnOnBack = new Runnable() {
+				@Override
+				public void run() {
+					btnBack.setEnabled(true);
+					btnCancel.setEnabled(true);
+					
+					try {
+						out.flush();
+						out.write(LogBuffer.ESCAPE_CODE_PREFIX + BufferPanel.STOP_BUSY);
+						out.flush();
+					} catch (IOException e) {}
+				}
+			};
+			SwingUtilities.invokeLater(turnOffBack);
+			
+			saveSettings();
+			CSVImporter importer =
+				new CSVImporter(dirStep.getBase().getAbsolutePath(), importDescription, getProject());
+			
+			Handler logHandler = new Handler() {
+				
+				@Override
+				public void publish(LogRecord record) {
+					try {
+						out.write(record.getMessage() + "\n");
+						out.flush();
+					} catch (IOException e) {}
+				}
+				
+				@Override
+				public void flush() {
+					
+				}
+				
+				@Override
+				public void close() throws SecurityException {
+					
+				}
+			};
+			Logger importLogger = Logger.getLogger(CSVImporter.class.getName());
+			importLogger.addHandler(logHandler);
+			
+			importer.setFileEncoding(dirStep.getFileEncoding());
+			importer.setTextDelimChar(dirStep.getTextDelimiter().orElse('\0'));
+			importer.setFieldDelimChar(dirStep.getFieldDelimiter().orElse('\0'));
+			
+			for(FileType ft:importDescription.getFile()) {
+				if(ft.isImport() && !isShutdown()) {
+					try {
+						LOGGER.info("Importing file '.../" + ft.getLocation() + "'");
+						importer.importFile(ft);
+					} catch (IOException e) {
+						LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+					}
+				}
+			}
+			
+			importLogger.removeHandler(logHandler);
+			
+			SwingUtilities.invokeLater(turnOnBack);
+		}
+		
 	}
 	
 }
