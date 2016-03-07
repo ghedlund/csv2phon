@@ -21,6 +21,9 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -40,9 +43,6 @@ import javax.swing.KeyStroke;
 import javax.swing.table.AbstractTableModel;
 
 import org.jdesktop.swingx.JXTable;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 import ca.phon.csv2phon.CSVParticipantUtil;
 import ca.phon.csv2phon.io.ImportDescriptionType;
@@ -206,7 +206,8 @@ public class ParticipantsStep extends CSVImportStep {
 		
 		if(getSettings() != null) {
 			for(ParticipantType pt:getSettings().getParticipant()) {
-				retVal.add(CSVParticipantUtil.copyXmlParticipant(SessionFactory.newFactory(), pt, DateTime.now()));
+				retVal.add(CSVParticipantUtil.copyXmlParticipant(SessionFactory.newFactory(), pt, 
+						LocalDate.now()));
 			}
 		}
 		
@@ -258,8 +259,8 @@ public class ParticipantsStep extends CSVImportStep {
 			} else if(columnIndex == 1) {
 				if(p.getBirthDate() != null) {
 					final DateTimeFormatter dateFormatter = 
-							DateTimeFormat.forPattern("yyyy-MM-dd");
-					retVal = dateFormatter.print(p.getBirthDate());
+							DateTimeFormatter.ofPattern("yyyy-MM-dd");
+					retVal = dateFormatter.format(p.getBirthDate());
 				}
 			} 
 			return retVal;

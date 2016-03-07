@@ -17,8 +17,7 @@
  */
 package ca.phon.phon2csv;
 
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatter;
 
 import ca.phon.session.AgeFormatter;
 import ca.phon.session.Participant;
@@ -65,8 +64,8 @@ public class SpeakerInfoColumn implements CSVExportColumn {
 			} else if(field.equalsIgnoreCase("birthday")) {
 				if(speaker.getBirthDate() != null) {
 					final DateTimeFormatter dateFormatter = 
-							DateTimeFormat.forPattern("yyyy-MM-dd");
-					retVal = dateFormatter.print(speaker.getBirthDate());
+							DateTimeFormatter.ofPattern("yyyy-MM-dd");
+					retVal = dateFormatter.format(speaker.getBirthDate());
 				}
 			} else {
 				retVal = "";

@@ -17,8 +17,7 @@
  */
 package ca.phon.phon2csv;
 
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatter;
 
 import ca.phon.session.Record;
 import ca.phon.session.Session;
@@ -50,8 +49,8 @@ public class SessionInfoColumn implements CSVExportColumn {
 		} else if(field.equalsIgnoreCase("Date")) {
 			if(t.getDate() != null) {
 				final DateTimeFormatter dateFormatter = 
-						DateTimeFormat.forPattern("yyyy-MM-dd");
-				retVal = dateFormatter.print(t.getDate());
+						DateTimeFormatter.ofPattern("yyyy-MM-dd");
+				retVal = dateFormatter.format(t.getDate());
 			}
 		} else {
 			retVal = "";

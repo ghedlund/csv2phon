@@ -1,5 +1,10 @@
 package ca.phon.csv2phon;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Period;
+import java.time.ZoneId;
+import java.util.GregorianCalendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -10,8 +15,6 @@ import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
-import org.joda.time.Period;
 
 import ca.phon.csv2phon.io.ObjectFactory;
 import ca.phon.csv2phon.io.ParticipantType;
@@ -32,11 +35,12 @@ public class CSVParticipantUtil {
 		retVal.setId(part.getId());
 		retVal.setName(part.getName());
 		
-		final DateTime bday = part.getBirthDate();
+		final LocalDate bday = part.getBirthDate();
 		if(bday != null) {
 			try {
 				final DatatypeFactory df = DatatypeFactory.newInstance();
-				final XMLGregorianCalendar cal = df.newXMLGregorianCalendar(bday.toGregorianCalendar());
+				final XMLGregorianCalendar cal = df.newXMLGregorianCalendar(
+						GregorianCalendar.from(bday.atStartOfDay(ZoneId.systemDefault())));
 				cal.setTimezone(DatatypeConstants.FIELD_UNDEFINED);
 				retVal.setBirthday(cal);
 			} catch (DatatypeConfigurationException e) {
@@ -78,7 +82,8 @@ public class CSVParticipantUtil {
 		return retVal;
 	}
 	
-	public static Participant copyXmlParticipant(SessionFactory factory, ParticipantType pt, DateTime sessionDate) {
+	public static Participant copyXmlParticipant(SessionFactory factory, ParticipantType pt,
+			LocalDate sessionDate) {
 		final Participant retVal = factory.createParticipant();
 		
 		retVal.setId(pt.getId());
@@ -86,11 +91,12 @@ public class CSVParticipantUtil {
 		
 		final XMLGregorianCalendar bday = pt.getBirthday();
 		if(bday != null) {
-			final DateTime bdt = new DateTime(bday.getYear(), bday.getMonth(), bday.getDay(), 12, 0);
+			final LocalDate bdt = 
+					LocalDate.of(bday.getYear(), bday.getMonth(), bday.getDay());
 			retVal.setBirthDate(bdt);
 			
 			// calculate age up to the session date
-			final Period period = new Period(bdt, sessionDate);
+			final Period period = Period.between(bdt, sessionDate);
 			retVal.setAgeTo(period);
 		}
 		

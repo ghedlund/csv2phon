@@ -23,15 +23,13 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 import au.com.bytecode.opencsv.CSVReader;
 import ca.phon.csv2phon.io.ColumnMapType;
@@ -193,8 +191,9 @@ public class CSVImporter {
 		
 		if(fileInfo.getDate() != null) {
 			final DateTimeFormatter dateFormatter = 
-					DateTimeFormat.forPattern("yyyy-MM-dd");
-			DateTime sessionDate = dateFormatter.parseDateTime(fileInfo.getDate());
+					DateTimeFormatter.ofPattern("yyyy-MM-dd");
+			LocalDate sessionDate = 
+					LocalDate.from(dateFormatter.parse(fileInfo.getDate()));
 			t.setDate(sessionDate);
 		}
 		

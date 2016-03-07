@@ -21,6 +21,8 @@ import java.awt.BorderLayout;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,9 +38,6 @@ import javax.swing.event.DocumentListener;
 import javax.swing.table.AbstractTableModel;
 
 import org.jdesktop.swingx.JXTable;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 import ca.phon.csv2phon.io.FileType;
 import ca.phon.csv2phon.io.ImportDescriptionType;
@@ -195,7 +194,7 @@ public class SessionInfoStep extends CSVImportStep {
 			ObjectFactory factory = new ObjectFactory();
 			
 			final DateTimeFormatter dateFormatter = 
-					DateTimeFormat.forPattern("yyyy-MM-dd");
+					DateTimeFormatter.ofPattern("yyyy-MM-dd");
 			// next, add entries for all csv files found in base
 			File[] csvFiles = getCSVFiles();
 			for(File csvFile:csvFiles) {
@@ -207,7 +206,7 @@ public class SessionInfoStep extends CSVImportStep {
 					ft.setImport(true);
 					ft.setLocation(csvFile.getName());
 					// try to find a date in the name or use today
-					ft.setDate(dateFormatter.print(findDate(ft.getLocation())));
+					ft.setDate(dateFormatter.format(findDate(ft.getLocation())));
 					ft.setMedia("");
 					ft.setSession(csvFile.getName().substring(0, 
 							csvFile.getName().indexOf(".csv")));
@@ -223,18 +222,19 @@ public class SessionInfoStep extends CSVImportStep {
 		 * 
 		 * @return the date found in the string or ${today}
 		 */
-		private DateTime findDate(String s) {
+		private LocalDate findDate(String s) {
 			Pattern p = Pattern.compile("[0-9]{4}-[0-9]{2}-[0-9]{2}");
 			Matcher m = p.matcher(s);
 			
-			DateTime retVal = DateTime.now();
+			LocalDate retVal = LocalDate.now();
 			
 			if(m.find()) {
 				String dateStr = 
 					s.substring(m.start(), m.end());
 				final DateTimeFormatter dateFormatter = 
-						DateTimeFormat.forPattern("yyyy-MM-dd");
-				retVal = dateFormatter.parseDateTime(dateStr);
+						DateTimeFormatter.ofPattern("yyyy-MM-dd");
+				retVal = 
+						LocalDate.from(dateFormatter.parse(dateStr));
 			}
 			
 			return retVal;
@@ -372,11 +372,11 @@ public class SessionInfoStep extends CSVImportStep {
 			} else if(columnIndex == 3) {
 				// convert to date
 				final DateTimeFormatter dateFormatter = 
-						DateTimeFormat.forPattern("yyyy-MM-dd");
-				DateTime setDate = dateFormatter.parseDateTime(value.toString());
+						DateTimeFormatter.ofPattern("yyyy-MM-dd");
+				LocalDate setDate = LocalDate.from(dateFormatter.parse(value.toString()));
 				
 				// and back to string
-				ft.setDate(dateFormatter.print(setDate));
+				ft.setDate(dateFormatter.format(setDate));
 			}
 		}
 	}
@@ -386,7 +386,7 @@ public class SessionInfoStep extends CSVImportStep {
 		public SessionDateEditor(JTextField textField) {
 			super(textField);
 			
-			textField.setDocument(new DateTimeDocument(DateTime.now()));
+			textField.setDocument(new DateTimeDocument(LocalDate.now()));
 		}
 		
 	}
