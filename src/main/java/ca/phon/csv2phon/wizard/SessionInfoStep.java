@@ -20,7 +20,6 @@ package ca.phon.csv2phon.wizard;
 import java.awt.BorderLayout;
 import java.io.File;
 import java.io.FilenameFilter;
-import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;

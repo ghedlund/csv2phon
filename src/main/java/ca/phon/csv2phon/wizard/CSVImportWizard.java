@@ -89,6 +89,34 @@ public class CSVImportWizard extends WizardFrame {
 		super.btnCancel.setText("Close");
 		
 		init();
+		
+		addWindowListener(new WindowAdapter() {
+
+			@Override
+			public void windowClosing(WindowEvent e) {
+				if(importTask != null) {
+					importTask.shutdown();
+				}
+			}
+			
+		});
+	}
+	
+	public void setSingleFile(boolean singleFile) {
+		if(singleFile) {
+			removeWizardStep(dirStep);
+			removeWizardStep(sessionInfoStep);
+			removeWizardStep(importStep);
+			
+			partsStep.setPrevStep(-1);
+			partsStep.setNextStep(1);
+			
+			columnMapStep.setPrevStep(0);
+			columnMapStep.setNextStep(-1);
+		} else {
+			super.removeAllSteps();
+			init();
+		}
 	}
 	
 	private void init() {
@@ -118,17 +146,6 @@ public class CSVImportWizard extends WizardFrame {
 		importStep = createImportStep();
 		importStep.setPrevStep(3);
 		importStep.setNextStep(-1);
-		
-		addWindowListener(new WindowAdapter() {
-
-			@Override
-			public void windowClosing(WindowEvent e) {
-				if(importTask != null) {
-					importTask.shutdown();
-				}
-			}
-			
-		});
 	}
 	
 	private WizardStep createImportStep() {
