@@ -56,6 +56,7 @@ import ca.phon.session.SessionFactory;
 import ca.phon.session.SystemTierType;
 import ca.phon.session.Tier;
 import ca.phon.session.TierDescription;
+import ca.phon.session.TierString;
 import ca.phon.session.TierViewItem;
 import ca.phon.syllabifier.Syllabifier;
 import ca.phon.syllabifier.SyllabifierLibrary;
@@ -338,7 +339,7 @@ public class CSVImporter {
 								ipaTier.addGroup(ipa);
 							}
 						} else if(systemTier == SystemTierType.Notes) {
-							utt.getNotes().addGroup(rowval);
+							utt.getNotes().addGroup(new TierString(rowval));
 						} else if(systemTier == SystemTierType.Segment) {
 							final MediaSegmentFormatter segmentFormatter = new MediaSegmentFormatter();
 							MediaSegment segment = factory.createMediaSegment();
