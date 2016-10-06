@@ -45,12 +45,17 @@ public class TierValueColumn implements CSVExportColumn {
 		// in parenthesis, we want a blind-transcription
 		String blindIPAPattern = 
 			"(IPA (?:Target|Actual)) \\((\\w+)\\)";
-		Pattern p = Pattern.compile(blindIPAPattern);
-		Matcher m = p.matcher(tierName);
+		Pattern blindPattern = Pattern.compile(blindIPAPattern);
+		Matcher blindMatcher = blindPattern.matcher(tierName);
 		
-		if(m.matches()) {
-			String tierName = m.group(1);
-			String username = m.group(2);
+		String syllabifiedIPAPattern =
+			"(IPA (?:Target|Actual)) Syllabified";
+		Pattern syllabifiedPattern = Pattern.compile(syllabifiedIPAPattern);
+		Matcher syllabifiedMatcher = syllabifiedPattern.matcher(tierName);
+		
+		if(blindMatcher.matches()) {
+			String tierName = blindMatcher.group(1);
+			String username = blindMatcher.group(2);
 			
 			final Tier<IPATranscript> ipaTier = 
 					(SystemTierType.IPATarget.getName().equals(tierName) ? utt.getIPATarget() : utt.getIPAActual());
@@ -63,6 +68,17 @@ public class TierValueColumn implements CSVExportColumn {
 				}
 				retVal += "]";
 			}
+		} else if(syllabifiedMatcher.matches()) {
+			String tierName = syllabifiedMatcher.group(1);
+			
+			final Tier<IPATranscript> ipaTier = 
+					(SystemTierType.IPATarget.getName().equals(tierName) ? utt.getIPATarget() : utt.getIPAActual());
+			StringBuffer sb = new StringBuffer();
+			for(IPATranscript grpVal:ipaTier) {
+				if(sb.length() > 0) sb.append(' ');
+				sb.append('[').append(grpVal.toString(true)).append(']');
+			}
+			retVal = sb.toString();
 		} else {
 			final Tier<String> tier = utt.getTier(tierName, String.class);
 			retVal = (tier != null ? tier.toString() : "[]");
