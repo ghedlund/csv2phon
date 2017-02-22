@@ -219,7 +219,7 @@ public class CSVImporter {
 				
 				if(!SystemTierType.isSystemTier(tierName) && !tierName.equalsIgnoreCase("Speaker:Name")) {
 					final TierDescription tierDesc =
-							factory.createTierDescription(tierName, colmap.isGrouped(), String.class);
+							factory.createTierDescription(tierName, colmap.isGrouped(), TierString.class);
 					t.addUserTier(tierDesc);
 					
 					final TierViewItem tvi = factory.createTierViewItem(tierName);
@@ -355,18 +355,18 @@ public class CSVImporter {
 							utt.getSegment().addGroup(segment);
 						}
 					} else {
-						Tier<String> tier = utt.getTier(phontier, String.class);
+						Tier<TierString> tier = utt.getTier(phontier, TierString.class);
 						if(tier == null) {
-							tier = factory.createTier(phontier, String.class, colmap.isGrouped());
+							tier = factory.createTier(phontier, TierString.class, colmap.isGrouped());
 							utt.putTier(tier);
 						}
 						
 						if(tier.isGrouped()) {
 							for(String grpVal:rowVals) {
-								tier.addGroup(grpVal);
+								tier.addGroup(new TierString(grpVal));
 							}
 						} else {
-							tier.setGroup(0, rowval);
+							tier.setGroup(0, new TierString(rowval));
 						}
 					}
 				}
