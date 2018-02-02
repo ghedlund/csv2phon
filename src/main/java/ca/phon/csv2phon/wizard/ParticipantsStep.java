@@ -163,7 +163,7 @@ public class ParticipantsStep extends CSVImportStep {
 		final SessionFactory factory = SessionFactory.newFactory();
 		Participant part = factory.createParticipant();
 		
-		boolean canceled = ParticipantEditor.editParticipant(CommonModuleFrame.getCurrentFrame(), part, getParticipants());
+		boolean canceled = ParticipantEditor.editNewParticipant(CommonModuleFrame.getCurrentFrame(), part, getParticipants());
 		
 		if(!canceled) {
 			getSettings().getParticipant().add(CSVParticipantUtil.copyPhonParticipant(new ObjectFactory(), part));

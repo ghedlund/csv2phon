@@ -3,22 +3,16 @@ package ca.phon.phon2csv;
 import java.awt.Window;
 import java.util.logging.Logger;
 
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JSeparator;
+import javax.swing.*;
 
 import ca.phon.app.project.ProjectWindow;
 import ca.phon.app.session.editor.SessionEditor;
 import ca.phon.phon2csv.sessionwizard.SessionCSVExportWizard;
 import ca.phon.phon2csv.wizard.CSVExportWizard;
-import ca.phon.plugin.IPluginExtensionFactory;
-import ca.phon.plugin.IPluginExtensionPoint;
-import ca.phon.plugin.IPluginMenuFilter;
-import ca.phon.plugin.PhonPlugin;
+import ca.phon.plugin.*;
 import ca.phon.project.Project;
-import ca.phon.ui.action.PhonActionEvent;
-import ca.phon.ui.action.PhonUIAction;
+import ca.phon.ui.action.*;
+import ca.phon.ui.menu.MenuBuilder;
 
 @PhonPlugin(name="phon2csv",
 	author="Greg J. Hedlund",
@@ -49,22 +43,13 @@ public class Phon2CSVMenuHandler
 	@Override
 	public void filterWindowMenu(Window owner, JMenuBar menuBar) {
 		if(owner instanceof ProjectWindow) {
-			JMenu pluginsMenu = null;
-			for(int i = 0; i < menuBar.getMenuCount(); i++) {
-				final JMenu menu = menuBar.getMenu(i);
-				if(menu.getText().equals("Plugins")) {
-					pluginsMenu = menu;
-					break;
-				}
-			}
+			final MenuBuilder builder = new MenuBuilder(menuBar);
 			
-			if(pluginsMenu != null) {
-				final PhonUIAction csv2PhonAct = new PhonUIAction(Phon2CSVMenuHandler.class, "phon2CsvWizard");
-				csv2PhonAct.setData(owner);
-				csv2PhonAct.putValue(PhonUIAction.NAME, "Export to CSV...");
-				csv2PhonAct.putValue(PhonUIAction.SHORT_DESCRIPTION, "Export Phon sessions as CSV");
-				pluginsMenu.add(csv2PhonAct);
-			}
+			final PhonUIAction csv2PhonAct = new PhonUIAction(Phon2CSVMenuHandler.class, "phon2CsvWizard");
+			csv2PhonAct.setData(owner);
+			csv2PhonAct.putValue(PhonUIAction.NAME, "Export to CSV...");
+			csv2PhonAct.putValue(PhonUIAction.SHORT_DESCRIPTION, "Export Phon sessions as CSV");
+			builder.addItem("./Tools", csv2PhonAct);
 		} else if(owner instanceof SessionEditor) {
 			JMenu fileMenu = menuBar.getMenu(0);
 			if(fileMenu == null) return;
