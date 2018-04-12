@@ -76,7 +76,7 @@
       <dependency>
           <groupId>ca.phon</groupId>
           <artifactId>phon-app</artifactId>
-          <version>2.2.0-SNAPSHOT</version>
+          <version>3.0.0-SNAPSHOT</version>
       </dependency>
   </dependencies>
   
@@ -86,35 +86,49 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.7.0</version>
         <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
+          <source>9</source>
+          <target>9</target>
           <sourceEncoding>UTF-8</sourceEncoding>
+          <compilerArgs>
+				<arg>--add-modules</arg>
+				<arg>java.xml.bind</arg>
+			</compilerArgs>
         </configuration>
       </plugin>
       
       <!-- Generate source for xml schema -->
       <plugin>
-        <groupId>org.jvnet.jaxb2.maven2</groupId>
-        <artifactId>maven-jaxb2-plugin</artifactId>
-        <version>0.10.0</version>
-        <executions>
-          <execution>
-            <id>generate</id>
-            <goals>
-              <goal>generate</goal>
-            </goals>
-            <configuration>
-              <schemaDirectory>src/main/resources/xml/xsd</schemaDirectory>
-              <bindingDirectory>src/main/resources/xml/xjb</bindingDirectory>
-              <specVersion>2.0</specVersion>
-              <extension>true</extension>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-xjc-plugin</artifactId>
+			<configuration>
+				<extensions>
+					<extension>org.apache.cxf.xjcplugins:cxf-xjc-dv:2.3.0</extension>
+				</extensions>
+			</configuration>
+			<executions>
+				<execution>
+					<id>generate-sources</id>
+					<phase>generate-sources</phase>
+					<goals>
+						<goal>xsdtojava</goal>
+					</goals>
+					<configuration>
+						<sourceRoot>${basedir}/target/generated-sources/xjc</sourceRoot>
+						<xsdOptions>
+							<xsdOption>
+								<xsd>${basedir}/src/main/resources/xml/xsd/CSVImport.xsd</xsd>
+								<packagename>ca.phon.csv2phon.io</packagename>
+								<bindingFile>${basedir}/src/main/resources/xml/xjb/CSVImport.xjb</bindingFile>
+							</xsdOption>
+						</xsdOptions>
+					</configuration>
+				</execution>
+			</executions>
+		</plugin>
     </plugins>
   </build>
   
-  <version>16</version>
+  <version>17</version>
 </project>
