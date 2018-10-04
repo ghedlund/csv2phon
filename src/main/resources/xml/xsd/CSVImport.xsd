@@ -4,7 +4,7 @@
     targetNamespace="http://phon.ling.mun.ca/ns/csvimport"> 
 
     <xs:import namespace="http://phon.ling.mun.ca/ns/phonbank" 
-        schemaLocation="https://github.com/ghedlund/phon/raw/master/session/src/main/resources/xml/xsd/phonbank-1_2.xsd"/>
+        schemaLocation="https://github.com/phon-ca/phon/raw/master/session/src/main/resources/xml/xsd/phonbank-1_2.xsd"/>
 
     <xs:element name="csvimport" type="importDescriptionType"/>
     <xs:complexType name="importDescriptionType">

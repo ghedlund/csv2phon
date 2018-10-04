@@ -26,10 +26,4 @@
         </jxb:schemaBindings>
     </jxb:bindings>
     
-    <jxb:bindings schemaLocation="https://github.com/ghedlund/phon/raw/master/session/src/main/resources/xml/xsd/phonbank-1_2.xsd" node="/xs:schema">
-    <jxb:schemaBindings>
-            <jxb:package name="ca.phon.csv2phon.io"/>
-        </jxb:schemaBindings>
-    </jxb:bindings>
-    
 </jxb:bindings>

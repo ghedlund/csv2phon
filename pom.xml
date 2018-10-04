@@ -72,11 +72,17 @@
     </pluginRepository>
   </pluginRepositories>
   
+  <properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.build.sourceVersion>10</project.build.sourceVersion>
+		<project.build.targetVersion>10</project.build.targetVersion>
+ </properties>
+  
   <dependencies>
       <dependency>
           <groupId>ca.phon</groupId>
           <artifactId>phon-app</artifactId>
-          <version>3.0.0-SNAPSHOT</version>
+          <version>3.0.1-SNAPSHOT</version>
       </dependency>
   </dependencies>
   
@@ -88,9 +94,9 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.7.0</version>
         <configuration>
-          <source>9</source>
-          <target>9</target>
-          <sourceEncoding>UTF-8</sourceEncoding>
+          <source>${project.build.sourceVersion}</source>
+		  <target>${project.build.targetVersion}</target>
+		  <sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
           <compilerArgs>
 				<arg>--add-modules</arg>
 				<arg>java.xml.bind</arg>
@@ -102,9 +108,10 @@
       <plugin>
 			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-xjc-plugin</artifactId>
+			<version>3.2.2</version>
 			<configuration>
 				<extensions>
-					<extension>org.apache.cxf.xjcplugins:cxf-xjc-dv:2.3.0</extension>
+					<extension>org.apache.cxf.xjcplugins:cxf-xjc-dv:3.2.2</extension>
 				</extensions>
 			</configuration>
 			<executions>
@@ -130,5 +137,5 @@
     </plugins>
   </build>
   
-  <version>17</version>
+  <version>18</version>
 </project>
