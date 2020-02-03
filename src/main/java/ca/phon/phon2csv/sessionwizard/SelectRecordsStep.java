@@ -24,8 +24,8 @@ import javax.swing.JPanel;
 
 import ca.phon.app.session.RecordFilterPanel;
 import ca.phon.project.Project;
-import ca.phon.session.RecordFilter;
 import ca.phon.session.Session;
+import ca.phon.session.filter.RecordFilter;
 import ca.phon.ui.decorations.DialogHeader;
 import ca.phon.ui.nativedialogs.FileFilter;
 import ca.phon.ui.text.FileSelectionField;

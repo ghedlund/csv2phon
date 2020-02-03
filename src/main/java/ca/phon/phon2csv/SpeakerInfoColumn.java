@@ -17,10 +17,10 @@ package ca.phon.phon2csv;
 
 import java.time.format.DateTimeFormatter;
 
-import ca.phon.session.AgeFormatter;
 import ca.phon.session.Participant;
 import ca.phon.session.Record;
 import ca.phon.session.Session;
+import ca.phon.session.format.AgeFormatter;
 
 public class SpeakerInfoColumn implements CSVExportColumn {
 

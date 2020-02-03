@@ -28,9 +28,9 @@ import java.util.logging.Logger;
 
 import au.com.bytecode.opencsv.CSVWriter;
 import ca.phon.session.Record;
-import ca.phon.session.RecordFilter;
 import ca.phon.session.Records;
 import ca.phon.session.Session;
+import ca.phon.session.filter.RecordFilter;
 import ca.phon.util.OSInfo;
 
 /**
