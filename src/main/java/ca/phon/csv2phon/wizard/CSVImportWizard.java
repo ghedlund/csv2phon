@@ -289,45 +289,37 @@ public class CSVImportWizard extends WizardFrame {
 			CSVImporter importer =
 				new CSVImporter(dirStep.getBase().getAbsolutePath(), importDescription, getProject());
 			
-			Handler logHandler = new Handler() {
-				
-				@Override
-				public void publish(LogRecord record) {
-					try {
-						out.write(record.getMessage() + "\n");
-						out.flush();
-					} catch (IOException e) {}
-				}
-				
-				@Override
-				public void flush() {
-					
-				}
-				
-				@Override
-				public void close() throws SecurityException {
-					
-				}
-			};
-			Logger importLogger = Logger.getLogger(CSVImporter.class.getName());
-			importLogger.addHandler(logHandler);
-			
 			importer.setFileEncoding(dirStep.getFileEncoding());
 			importer.setTextDelimChar(dirStep.getTextDelimiter().orElse('\0'));
 			importer.setFieldDelimChar(dirStep.getFieldDelimiter().orElse('\0'));
-			
+
+			int numFilesCompleted = 0;
 			for(FileType ft:importDescription.getFile()) {
 				if(ft.isImport() && !isShutdown()) {
 					try {
-						LOGGER.info("Importing file '.../" + ft.getLocation() + "'");
+						String msg = String.format("Importing file '.../%s'", ft.getLocation());
+						LOGGER.info(msg);
+						out.write(msg);
+						out.write("\n");
+						out.flush();
 						importer.importFile(ft);
+						++numFilesCompleted;
 					} catch (IOException e) {
 						LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+						try {
+							out.write("Unable to import file: " + e.getLocalizedMessage());
+							out.write("\n");
+							out.flush();
+						} catch (IOException ex) {}
 					}
 				}
 			}
-			
-			importLogger.removeHandler(logHandler);
+
+			try {
+				out.write("=============================\n");
+				out.write(String.format("%d/%d files imported\n", numFilesCompleted, importDescription.getFile().size()));
+				out.flush();
+			} catch (IOException e) {}
 			
 			SwingUtilities.invokeLater(turnOnBack);
 		}

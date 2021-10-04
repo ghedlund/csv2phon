@@ -16,10 +16,7 @@
 package ca.phon.phon2csv.wizard;
 
 import java.awt.BorderLayout;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Handler;
@@ -113,7 +110,7 @@ public class CSVExportWizard extends WizardFrame {
 		worker.setName("CSV Exporter");
 		worker.setFinishWhenQueueEmpty(true);
 		
-		final BufferedWriter out = new BufferedWriter(new OutputStreamWriter(bufferPanel.getLogBuffer().getStdOutStream(), "UTF-8"));
+		final PrintWriter out = new PrintWriter(new OutputStreamWriter(bufferPanel.getLogBuffer().getStdOutStream(), "UTF-8"));
 		
 		Runnable r = new Runnable() {
 			@Override
@@ -123,12 +120,10 @@ public class CSVExportWizard extends WizardFrame {
 					public void run() {
 						btnBack.setEnabled(false);
 						btnCancel.setEnabled(false);
-						
-						try {
+
 							out.flush();
 							out.write(LogBuffer.ESCAPE_CODE_PREFIX + BufferPanel.SHOW_BUSY);
 							out.flush();
-						} catch (IOException e) {}
 					}
 				};
 				Runnable turnOnBack = new Runnable() {
@@ -136,12 +131,10 @@ public class CSVExportWizard extends WizardFrame {
 					public void run() {
 						btnBack.setEnabled(true);
 						btnCancel.setEnabled(true);
-						
-						try {
+
 							out.flush();
 							out.write(LogBuffer.ESCAPE_CODE_PREFIX + BufferPanel.STOP_BUSY);
 							out.flush();
-						} catch (IOException e) {}
 					}
 				};
 				SwingUtilities.invokeLater(turnOffBack);
@@ -154,52 +147,33 @@ public class CSVExportWizard extends WizardFrame {
 				CSVExporter exporter = 
 					new CSVExporter(cols);
 				
-				Handler logHandler = new Handler() {
-					
-					@Override
-					public void publish(LogRecord record) {
-						try {
-							out.write(record.getMessage() + "\n");
-							out.flush();
-						} catch (IOException e) {}
-					}
-					
-					@Override
-					public void flush() {
-						
-					}
-					
-					@Override
-					public void close() throws SecurityException {
-						
-					}
-				};
-				Logger logger = Logger.getLogger(CSVExporter.class.getName());
-				logger.addHandler(logHandler);
-				LOGGER.addHandler(logHandler);
-				
 				Project proj = getProject();
-				bufferPanel.getLogBuffer().append("Writing files to directory '" + dirStep.getBase() + "'");
-				bufferPanel.getLogBuffer().append("Files will be written using encoding 'UTF-8'");
-				
+				bufferPanel.getLogBuffer().append("Writing files to directory '" + dirStep.getBase() + "'\n");
+				bufferPanel.getLogBuffer().append("Files will be written using encoding 'UTF-8'\n");
+
+				int numFilesExported = 0;
 				List<SessionPath> sessions = dirStep.getSelectedSessions();
 				for(SessionPath loc:sessions) {
 					try {
 						Session t = proj.openSession(loc.getCorpus(), loc.getSession());
-						
+						out.println("Exporting session " + loc.toString());
+						out.flush();
 						exporter.exportSession(t, dirStep.getBase() + 
 								File.separator + t.getCorpus() + "-" + t.getName() + ".csv");
-						
+
+						++numFilesExported;
 					} catch (IOException e) {
 						LOGGER.log(Level.SEVERE,
 								e.getLocalizedMessage(), e);
+						out.println("Unable to export session: " + e.getLocalizedMessage());
+						out.flush();
 					}
 				}
-				
+
+				out.println("=============================");
+				out.println(String.format("%d/%d sessions exported", numFilesExported, sessions.size()));
+				out.flush();
 				LOGGER.info("Export complete.");
-				
-				logger.removeHandler(logHandler);
-				LOGGER.removeHandler(logHandler);
 				
 				SwingUtilities.invokeLater(turnOnBack);
 			}
