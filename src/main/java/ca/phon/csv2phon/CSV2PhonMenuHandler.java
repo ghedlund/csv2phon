@@ -41,14 +41,7 @@ public class CSV2PhonMenuHandler
 
 	@Override
 	public IPluginExtensionFactory<IPluginMenuFilter> getFactory() {
-		return new IPluginExtensionFactory<IPluginMenuFilter>() {
-			
-			@Override
-			public IPluginMenuFilter createObject(Object... args) {
-				return CSV2PhonMenuHandler.this;
-			}
-			
-		};
+		return (args) -> this;
 	}
 
 	@Override
@@ -59,15 +52,14 @@ public class CSV2PhonMenuHandler
 		final MenuBuilder builder = new MenuBuilder(menuBar);
 		builder.addSeparator("./Tools", "csv2phon");
 		
-		final PhonUIAction csv2PhonAct = new PhonUIAction(CSV2PhonMenuHandler.class, "csv2PhonWizard");
-		csv2PhonAct.setData(cmf);
+		final PhonUIAction<ProjectWindow> csv2PhonAct = PhonUIAction.eventConsumer(CSV2PhonMenuHandler::csv2PhonWizard, (ProjectWindow) cmf);
 		csv2PhonAct.putValue(PhonUIAction.NAME, "Import from CSV...");
 		csv2PhonAct.putValue(PhonUIAction.SHORT_DESCRIPTION, "Import CSV files as new Sessions in the current project.");
 		builder.addItem("./Tools@csv2phon", csv2PhonAct);
 	}
 	
-	public static void csv2PhonWizard(PhonActionEvent pae) {
-		final ProjectWindow pw = (ProjectWindow)pae.getData();
+	public static void csv2PhonWizard(PhonActionEvent<ProjectWindow> pae) {
+		final ProjectWindow pw = pae.getData();
 		final Project project = pw.getProject();
 		if(project == null) return;
 		

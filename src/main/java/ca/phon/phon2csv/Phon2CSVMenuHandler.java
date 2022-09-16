@@ -60,8 +60,7 @@ public class Phon2CSVMenuHandler
 		if(owner instanceof ProjectWindow) {
 			final MenuBuilder builder = new MenuBuilder(menuBar);
 			
-			final PhonUIAction csv2PhonAct = new PhonUIAction(Phon2CSVMenuHandler.class, "phon2CsvWizard");
-			csv2PhonAct.setData(owner);
+			final PhonUIAction<ProjectWindow> csv2PhonAct = PhonUIAction.eventConsumer(Phon2CSVMenuHandler::phon2CsvWizard, (ProjectWindow) owner);
 			csv2PhonAct.putValue(PhonUIAction.NAME, "Export as CSV...");
 			csv2PhonAct.putValue(PhonUIAction.SHORT_DESCRIPTION, "Export Phon sessions as CSV");
 			builder.addItem("./Tools", csv2PhonAct);
@@ -69,8 +68,7 @@ public class Phon2CSVMenuHandler
 			JMenu fileMenu = menuBar.getMenu(0);
 			if(fileMenu == null) return;
 		
-			final PhonUIAction saveAsCsvAct = new PhonUIAction(Phon2CSVMenuHandler.class, "session2CsvWizard");
-			saveAsCsvAct.setData(owner);
+			final PhonUIAction<SessionEditor> saveAsCsvAct = PhonUIAction.eventConsumer(Phon2CSVMenuHandler::session2CsvWizard, (SessionEditor) owner);
 			saveAsCsvAct.putValue(PhonUIAction.NAME, "Export session (CSV)...");
 			saveAsCsvAct.putValue(PhonUIAction.SHORT_DESCRIPTION, "Export session as CSV");
 			fileMenu.add(new JSeparator(), 0);
@@ -78,8 +76,8 @@ public class Phon2CSVMenuHandler
 		}
 	}
 	
-	public static void phon2CsvWizard(PhonActionEvent pae) {
-		final ProjectWindow pw = (ProjectWindow)pae.getData();
+	public static void phon2CsvWizard(PhonActionEvent<ProjectWindow> pae) {
+		final ProjectWindow pw = pae.getData();
 		final Project project = pw.getProject();
 		if(project == null) return;
 		
@@ -89,7 +87,7 @@ public class Phon2CSVMenuHandler
 		wizard.showWizard();
 	}
 
-	public static void session2CsvWizard(PhonActionEvent pae) {
+	public static void session2CsvWizard(PhonActionEvent<SessionEditor> pae) {
 		final SessionEditor sessionEditor = (SessionEditor)pae.getData();
 		
 		final SessionCSVExportWizard wizard = 
