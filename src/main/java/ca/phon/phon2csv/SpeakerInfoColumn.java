@@ -15,6 +15,7 @@
  */
 package ca.phon.phon2csv;
 
+import java.time.Period;
 import java.time.format.DateTimeFormatter;
 
 import ca.phon.session.Participant;
@@ -43,10 +44,12 @@ public class SpeakerInfoColumn implements CSVExportColumn {
 			if(field.equalsIgnoreCase("name")) {
 				retVal = speaker.toString();
 			} else if(field.equalsIgnoreCase("age")) {
-				if(t.getDate() != null && speaker.getBirthDate() != null) {
-					final AgeFormatter ageFormatter = new AgeFormatter();
-					retVal = ageFormatter.format(speaker.getAge(t.getDate()));
+				Period age = speaker.getAge(null);
+				if(age == null && (t.getDate() != null && speaker.getBirthDate() != null)) {
+					age = speaker.getAge(t.getDate());
 				}
+				final AgeFormatter ageFormatter = new AgeFormatter();
+				retVal = ageFormatter.format(age);
 			} else if(field.equalsIgnoreCase("education")) {
 				retVal = speaker.getEducation();
 			} else if(field.equalsIgnoreCase("language")) {
